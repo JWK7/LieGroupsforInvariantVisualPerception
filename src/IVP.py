@@ -37,6 +37,8 @@ class InvariantVisualPercentron:
         # self.I0 = (self.I0 - np.min(self.I0)) / (np.max(self.I0)- np.min(self.I0))
         # self.Ix = (self.Ix - np.min(self.Ix)) / (np.max(self.Ix)- np.min(self.Ix))
         # self.calcDeltaI(Ix,I0)
+        print('hi')
+        
         # self.T = self.T[0]
         self.I0 = np.reshape(self.I0,(20,1))
         self.G = 1*np.random.normal(0,1,(20,20))
