@@ -18,7 +18,6 @@ class InvariantVisualPercentron:
         self.C = C
         return
     def DataExtraction(self):
-        # self.I0 = dataFunctions.Image1D()
         self.I0 = dataFunctions.Image1D()
         self.T = []
         self.Ix = []
@@ -31,15 +30,8 @@ class InvariantVisualPercentron:
             self.Ix.append(Ix)
             self.deltaI.append(self.calcDeltaI(Ix,self.I0))
             self.savex.append(1)
-            self.x.append([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2)+np.random.normal(0,1,self.I0.shape[1])])
+            self.x.append([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2)])#+np.random.normal(0,1,self.I0.shape[1])])
             self.T.append(T)
-
-        # self.I0 = (self.I0 - np.min(self.I0)) / (np.max(self.I0)- np.min(self.I0))
-        # self.Ix = (self.Ix - np.min(self.Ix)) / (np.max(self.Ix)- np.min(self.Ix))
-        # self.calcDeltaI(Ix,I0)
-        print('hi')
-        
-        # self.T = self.T[0]
         self.I0 = np.reshape(self.I0,(20,1))
         self.G = 1*np.random.normal(0,1,(20,20))
         self.saveG = 1*np.random.normal((20,20))
@@ -47,50 +39,26 @@ class InvariantVisualPercentron:
     
     def calcDeltaI(self,Ix,I0):
         deltaI = Ix-I0
-        # self.deltaI = self.x * np.matmul(self.G,self.I0) + np.random.normal(0,self.sigma**2,size = self.I0.shape)
-        # print(np.random.normal(0.0,self.sigma^2))#, size = (400)))# (self.I0.shape[0])))
-        # print(self.sigma**2)
         return deltaI
 
     def Optimize(self):
         errComp = float('inf')
         self.G = pandas.read_csv("LieOpOpt_20.csv",header=None).to_numpy()
 
-        # img = np.reshape(np.matmul(scipy.linalg.expm(5 * self.G),self.I0),(1,20))
-        # cv2.imwrite('UsingLieOpOPt.jpg', img)
-
         # return
         print(self.G.shape)
-        for i in range(1000):
-            err = 0
-            for j in range(len(self.x)):
-                err += np.sum(np.abs(self.deltaI[j] -self.x[j] * np.matmul(self.G,self.I0)))
-
-
-            # err = np.sum(np.abs(self.Ix - np.matmul(scipy.linalg.expm(self.savex * self.saveG),self.I0)))
-            print(i)
-            print(err)
-            if err < errComp:
-                self.saveG = self.G
-                self.savex = self.x
-            #     errComp = err
-
-            # # print(self.G)
-            # self.OptimizeG()
-            # self.x = 500
-
-            # for i in range(10):
-            #     # print(scipy.linalg.expm(self.x * self.G)[0])
-            # #     # print(self.exp(11)[0])
-            #     self.Optimizex()
-            #     print(self.x)
-                # print(self.x)
-            # print('hi')
-            #     # print(scipy.linalg.expm(self.x * self.G))
-            #     # print(np.linalg.expm(self.x*self.G))
-            #     # print(self.exp(6))
+        for i in range(10000):
+            # err = (*range(len(self.x[0])))
+            # for j in range(len(self.x)):
+            #     for k in range(len(self.x[j])):
+            #     err += np.sum(np.abs(self.deltaI[j] -self.x[j][k] * np.matmul(self.G,self.I0)))
+            # print(i)
+            # print(err)
+            # if err < errComp:
+            #     self.saveG = self.G
+            #     self.savex = self.x
             self.Optimizex()
-            # self.gamma *= 0.8
+            # self.gamma *= 0.9
         print(self.gamma)
 
         # print(self.G)
@@ -118,26 +86,44 @@ class InvariantVisualPercentron:
     def Optimizex(self):
         # filler = [0,0,0,0,0,,0,0]
         # for i in range(len(self.x)):
-        #     filler = (self.gamma * np.matmul(
-        #     np.transpose(
-        #         np.matmul(
-        #             np.matmul(self.exp(10,self.x[i]),self.G)
-        #             ,self.I0)
-        #             )
-        #             , (self.Ix - np.matmul(self.exp(10,self.x[i]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i]))[0][0]
+        #     for j in range(len(self.x[i])):
+        #         self.x[i][j] += (self.gamma * np.matmul(
+        #         np.transpose(
+        #             np.matmul(
+        #                 np.matmul(self.exp(10,self.x[i][j]),self.G)
+        #                 ,self.I0)
+        #                 )
+        #                 , (self.Ix[i] - np.matmul(self.exp(10,self.x[i][j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
+        #         print((self.gamma * np.matmul(
+        #         np.transpose(
+        #             np.matmul(
+        #                 np.matmul(self.exp(10,self.x[i][j]),self.G)
+        #                 ,self.I0)
+        #                 )
+        #                 , (self.Ix[i] - np.matmul(self.exp(10,self.x[i][j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0])
         
-            # self.x[i] += (self.gamma)*( ((1/self.sigma**2)*np.matmul( np.transpose((self.deltaI[i] - np.matmul(self.x[i]*self.G, self.I0))),
-            # np.matmul(self.G , self.I0))) -(self.x[i]/self.sigmaX**2))[0][0]
+        # for i in range(len(self.x)):
+        #     for j in range(len(self.x[i])):
+        #         self.x[i][j] += (self.gamma)*( ((1/self.sigma**2)*np.matmul( np.transpose((self.deltaI[i] - np.matmul(self.x[i][j]*self.G, self.I0))),
+        #         np.matmul(self.G , self.I0))) -(self.x[i][j]/self.sigmaX**2))[0][0]
 
 
         for i in range(len(self.x)):
-            self.x[i] += (self.gamma * np.matmul(
-            np.transpose(
-                np.matmul(
-                    np.matmul(scipy.linalg.expm(self.x[i] * self.G),self.G)
-                    ,self.I0)
-                    )
-                    , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i] * self.G),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i]))[0][0]
+            for j in range(len(self.x[i])):
+                self.x[i][j] += (self.gamma * np.matmul(
+                np.transpose(
+                    np.matmul(
+                        np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.G)
+                        ,self.I0)
+                        )
+                        , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
+                # print((self.gamma * np.matmul(
+                # np.transpose(
+                #     np.matmul(
+                #         np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.G)
+                #         ,self.I0)
+                #         )
+                #         , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0])
         
         # print("sum")
         # print(np.sum(np.abs(filler-filler2)))
@@ -159,13 +145,13 @@ class InvariantVisualPercentron:
         # cv2.imwrite('outputs/Catoriginal.jpg',img2)
         # cv2.imwrite('outputs/Catprediction2'+str(i)+'.jpg',img3)
         for i in range(len(self.x)):
-            img = np.reshape(np.matmul(scipy.linalg.expm(self.savex[i] * self.saveG),self.I0),(1,20))
+            img = np.reshape(np.matmul(scipy.linalg.expm(min(self.x[i]) * self.saveG),self.I0),(1,20))
             cv2.imwrite('Catprediction'+str(i)+'.jpg', img)
             img2 = np.reshape(self.Ix[i],(1,20))
             cv2.imwrite('Catgroundtruth'+str(i)+'.jpg',img2)
             img2 = np.reshape(self.I0,(1,20))
             cv2.imwrite('Catoriginal.jpg',img2)
-            img3 = np.reshape(np.matmul(self.savex[i]*self.saveG,self.I0),(1,20))
+            img3 = np.reshape(np.matmul(min(self.x[i])*self.saveG,self.I0),(1,20))
             cv2.imwrite('Catprediction2'+str(i)+'.jpg',img3)
         return
 
@@ -173,8 +159,10 @@ class InvariantVisualPercentron:
 if __name__ == "__main__":
     # x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.000000001,gamma=0.02,C=0.001)
     # x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.000000001,gamma=0.000001,C=0.001)
-    x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.0001,gamma=0.000001,C=0.0001)
+    x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.000001,gamma=0.00001,C=0.0001)
     x.DataExtraction()
-    print(x.x)
-    # x.Optimize()
+    # print(x.x)
+    x.Optimize()
+    for i in range(len(x.x)):
+        print(min(x.x[i]))
     # x.ConstructImage()
