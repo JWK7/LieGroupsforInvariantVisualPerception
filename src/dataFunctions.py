@@ -23,18 +23,18 @@ def ImageToDataFrame() -> np.ndarray:
 #1D Translation from I0
 def Translation1D(I0: np.ndarray,T) -> np.ndarray:
     Ts = np.array(T)
-    Ts -= (Ts>0)*((I0.shape)[1]//2)
+    Ts -= (Ts>0)*((I0.shape)[1])
 
     Ix = np.empty(I0.shape)
-    THistory = np.empty(I0.shape[0])
+    # THistory = np.empty(I0.shape[0])
     for i in range(I0.shape[0]):
         # T = np.random.randint(1,50)
-        THistory[i] = Ts
+        # THistory[i] = Ts
 
         for j in range(I0.shape[1]):
             Ix[i][j] = I0[i][j+Ts]
 
-    return THistory,Ix
+    return T,Ix
 
 
 def Image1D():
