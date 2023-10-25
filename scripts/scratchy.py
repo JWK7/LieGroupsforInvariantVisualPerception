@@ -1,1 +1,1 @@
-print(*range(-19,5,1))
+print(*range(-19.0,5.0,0.01))

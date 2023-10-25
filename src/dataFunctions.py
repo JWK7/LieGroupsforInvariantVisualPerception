@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import glob
 #Processes Images
+import scipy.ndimage
+
 def ProcessImage(ImageSize: tuple):
     for i in range(1,200):
         img = cv2.imread("data/OriginalImages/cat."+str(i)+".jpg")
@@ -36,6 +38,13 @@ def Translation1D(I0: np.ndarray,T) -> np.ndarray:
 
     return T,Ix
 
+def Range(start,end,interval):
+    i = start
+    output = []
+    while (i < end):
+        output.append(i)
+        i+=interval
+    return output
 
 def Image1D():
     Img = np.ones((1,20))
@@ -43,6 +52,9 @@ def Image1D():
     Img[0][9] = 100.0
     Img[0][11] = 100.0
     return Img
+
+def Translation1DSubPixel(I0: np.ndarray,T) -> np.ndarray:
+    return T,scipy.ndimage.shift(I0, (0, T),mode ='wrap')
     
 
 # def Rotation2D(I0: np.ndarray) -> np.ndarray:
