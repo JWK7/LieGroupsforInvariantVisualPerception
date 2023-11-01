@@ -21,289 +21,173 @@ class InvariantVisualPercentron:
         self.alpha = alpha
         self.gamma = gamma
         self.CInv = CInv
+        self.trueG = pd.read_csv("LieOpOpt_20.csv",header=None).to_numpy()
         return
-    def DataExtraction(self):
-        self.I0 = dataFunctions.Image1D()
-        self.T = []
-        self.Ix = []
-        self.x = []
-        self.savex = []
-        self.deltaI = []
-        for i in range(1,2,1):
-            # T, Ix = dataFunctions.Translation1D(self.I0,i)
-            T,Ix = dataFunctions.Translation1DSubPixel(self.I0,-i*0.05)
-            # print(Ix)
-            # print(Ix2)
-            # self.Ix.append(Ix)
-            self.deltaI.append(np.reshape(self.calcDeltaI(Ix,self.I0),(20,1)))
-            # print(deltaI)
-            self.Ix.append(np.reshape(Ix,(20,1)))
-            self.savex.append(1)
-            self.x.append(dataFunctions.Range(-self.I0.shape[1]*0.05/4,self.I0.shape[1]*0.05/4,0.05))#+np.random.normal(0,1,self.I0.shape[1])])
-
-            # print([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2)])
-
-            # self.x.append([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2)])#+np.random.normal(0,1,self.I0.shape[1])])
-            self.T.append(T)
-        # self.x = [[5]]
-        self.I0 = np.reshape(self.I0,(20,1))
-        self.G = 1*np.random.normal(0,1,(len(self.x[0]),20,20))
-        self.saveG = 1*np.random.normal((20,20))
+    
+    def DataExtraction(self, DataSize: int = 1000,T: float = 0.5,mode = 'Small'):
+        self.TParam = T
+        self.I0 = dataFunctions.Image1D(DataSize)
+        if mode == 'Small':
+            self.T , self.Ix = dataFunctions.Translation1DImage(self.I0,T,self.trueG)
+        if mode == 'Large':
+            self.T , self.Ix = dataFunctions.Translation1DImageLarge(self.I0,T)
+        self.deltaI = self.Ix-self.I0
         return 
     
     def calcDeltaI(self,Ix,I0):
         deltaI = Ix-I0
         return deltaI
 
-    def Optimize(self):
-        errComp = float('inf')
-        trueG = pd.read_csv("LieOpOpt_20.csv",header=None).to_numpy()
-        for i in range(self.G.shape[0]):
-            self.G[i] = trueG
-        # print(5*self.G[0]*self.I0.flatten())
-        # print((1*np.matmul(trueG,(self.I0))).astype(int))
-
-
-        # print((1*np.matmul(np.transpose(self.I0),(trueG)).astype(int)))
-
-
-        # self.G *= 100
-        # print(self.G)
-        # print(expxGI0)
-        # print(self.Ix)
-        # print(np.matmul(-5*self.G,self.I0))
-        # print(self.I0)
-        # print((self.deltaI[0] - np.matmul(-5*self.G,self.I0)).astype(int))
-        # print(self.deltaI[0])
-        # print((np.matmul(scipy.linalg.expm(-5 * self.G),self.I0)))
-        # print(self.Ix[0]-(np.matmul(scipy.linalg.expm(-5 * self.G),self.I0)))
-        
-        # print(self.Ix[0])
-        # print(np.matmul(scipy.linalg.expm(5 * self.G),self.I0))
-        # print(np.sum(np.abs(self.Ix[0] - np.matmul(scipy.linalg.expm(-1 * self.G),self.I0))))
-        # return
-        # print(self.G.shape)
-        # print(self.G)
-        # self.x = 
-        print(self.x)
-        print('\n\n\n\n')
-        for m in range(1000):
-            # errors = np.zeros((len(self.x),len(self.x[0])))
-            # errors2 = np.zeros((len(self.x),len(self.x[0])))
-            # for i in range(len(self.x)):
-            #     for j in range(len(self.x[i])):
-            #         print(self.x[i][j])
-            #         errors[i][j] = np.sum(np.abs(self.deltaI[i] - np.matmul(self.x[i][j]*self.G,self.I0)))
-            #         errors2[i][j] = np.sum(np.abs(self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.I0)))
-            #         print(errors2[i][j])
-            # err = (*range(len(self.x[0])))
-            # for j in range(len(self.x)):
-
-            #     for k in range(len(self.x[j])):
-            #     err += np.sum(np.abs(self.deltaI[j] -self.x[j][k] * np.matmul(self.G,self.I0)))
-            # print(i)
-            # print(err)
-            # if err < errComp:
-            #     self.saveG = self.G
-            #     self.savex = self.x
-            # print(self.x)
-            self.OptimizeG()
-            self.Optimizex()
-            self.gamma *= 0.9
-            self.alpha *= 0.9
-            # self.alpha /=1.0001
-            # for i in range(100):
-            #     self.Optimizex()
-            #     print(self.x)
-            # self.OptimizeG()
-            # print(self.x[0][0])
-            # for i in range(len(self.x)):
-            #     for j in range(len(self.x[i])):
-            #         if self.x[i][j] > 100000 or self.x[i][j] < -100000:
-            #             self.x[i][j] = 0
-            # print(self.G[19])
-            # self.alpha *= 0.9
-            # print(np.sum(np.abs(self.G[15]-self.G[19])))
-        # print(self.x)
-
-        # print(self.G)
-        # print(np.sum(np.abs(np.subtract(trueG,self.G[0]))))
-        # print(np.sum(np.abs(np.subtract(trueG,np.zeros((20,20))))))
-        #     print(trueG-self.G)
-        #     for i in range(len(self.x)):
-        #         print(np.sum(np.abs(np.subtract(trueG,self.G[i]))))
-        #     # print(self.G)
-        #     print(self.x)
-        #     # return
-        #     # self.gamma *= 0.9
-        print(self.G.shape)
-        for i in range(len(self.x[0])):
-            print("i")
-            print(np.sum(np.abs(self.Ix[0] - np.matmul(scipy.linalg.expm(self.x[0][i] * self.G[i]),self.I0))))
-            print(np.sum(np.abs(self.Ix[0] - np.matmul(scipy.linalg.expm(self.x[0][i] * trueG),self.I0))))
-        print(np.sum(np.abs(self.Ix[0] - np.matmul(scipy.linalg.expm(0.05 * trueG),self.I0))))
-        print(self.x)
-        print(np.sum(np.abs(np.subtract(trueG,self.G[0]))))
-
-        cv2.imwrite('G.jpg',self.G[0]*1000)
-        # print(self.T)
-        # print(self.x)
-        # for i in range(len(self.x[0])):
-        #     print(self.x[0][i])
-        #     print(np.sum(np.abs(trueG-self.G[i])))
-        # print(self.G[0])
-        # print(self.x[0])
+    def Optimize(self, G: np.array = None, mode: str = 'Small', epoch: int = 100, timeEpoch: int = 1,numberOfInitialX=10):
+        if mode == 'Small':
+            self.SmallOptimization(epoch, timeEpoch,numberOfInitialX)
+            return
+        if mode == 'Large':
+            self.LargeOptimization(G,epoch,numberOfInitialX)
+            return
+        print("Unavailable Mode")
         return 
+
+    def SmallOptimization(self, epoch: int = 100, timeEpoch: int = 1,numberOfInitialX: int = 10):
+        xs = (np.random.uniform(-self.TParam,self.TParam,(self.I0.shape[0],numberOfInitialX)))
+        Gs = np.random.normal(0,0.0000,size = (numberOfInitialX,self.I0.shape[1],self.I0.shape[1]))
+        for _ in range(epoch):
+            Gs = self.OptimizeG(xs,Gs)
+            self.alpha /= 1.0001
+            for _ in range(timeEpoch):
+                xs = self.OptimizexSmall(xs,Gs)
+        self.SaveOptimal(xs,Gs)
+        self.GenerateImages()
+        return 
+    
+    def LargeOptimization(self, G,epoch: int = 100,numberOfInitialX: int = 10):
+        # G = self.trueG
+        xs = (np.random.uniform(-self.TParam,self.TParam,(self.I0.shape[0],numberOfInitialX)))
+        # xs = np.asarray([*range(-int(self.TParam), int(self.TParam+1))])
+        # xs = np.reshape(xs,(xs.shape,1))
+        for _ in range(10):
+            self.gamma *= 0.9
+            xs = self.OptimizexLarge(xs,G)
+            print(xs[0])
+        self.SaveOptimalLarge(xs,G)
+        self.GenerateImagesLarge()
+        return 
+    
+    def GenerateImages(self,samples: int = 5):
+        cv2.imwrite('outputs/Ghat.jpg',self.Ghat*1000)
+        cv2.imwrite('outputs/G.jpg',self.trueG*1000)
+
+        for i in range(samples):
+            cv2.imwrite('outputs/Small'+str(i)+'Ixhat.jpg',np.reshape(self.Ixhat[i],(1,20)))
+            cv2.imwrite('outputs/Small'+str(i)+'Ix.jpg',np.reshape(self.Ix[i],(1,20)))
+            cv2.imwrite('outputs/Small'+str(i)+'I0.jpg',np.reshape(self.I0[i],(1,20)))
+        return
+    
+    def GenerateImagesLarge(self,samples: int = 5):
+
+        for i in range(samples):
+            cv2.imwrite('outputs/Large'+str(i)+'Ixhat.jpg',np.reshape(self.Ixhat[i],(1,20)))
+            cv2.imwrite('outputs/Large'+str(i)+'Ix.jpg',np.reshape(self.Ix[i],(1,20)))
+            cv2.imwrite('outputs/Large'+str(i)+'I0.jpg',np.reshape(self.I0[i],(1,20)))
+        return
+
+    def SaveOptimal(self,xs,Gs):
+        xsReshape = np.reshape(xs,(xs.shape[0],xs.shape[1],1,1))
+        IxReshape = np.reshape(self.Ix,(self.Ix.shape[0],1,self.Ix.shape[1],self.Ix.shape[2]))
+        I0Reshape = np.reshape(self.I0,(self.I0.shape[0],1,self.I0.shape[1],self.I0.shape[2]))
+        GsReshape = np.reshape(Gs,(1,Gs.shape[0],Gs.shape[1],Gs.shape[2]))
+
+        predictions = (np.matmul(scipy.linalg.expm(xsReshape*GsReshape),I0Reshape))
+        Errors = np.sum(np.abs(IxReshape - predictions),axis=(0,2,3))
+
+        self.xhat = xs[:,np.argmin(Errors)]
+        self.Ghat = Gs[np.argmin(Errors),:,:]
+        self.Ixhat = predictions[:,np.argmin(Errors),:,:]
+        print(self.xhat[0])
+        print(self.Ixhat[0])
+
+        return
+    
+    def SaveOptimalLarge(self,xs,Gs):
+        xsReshape = np.reshape(xs,(xs.shape[0],xs.shape[1],1,1))
+        IxReshape = np.reshape(self.Ix,(self.Ix.shape[0],1,self.Ix.shape[1],self.Ix.shape[2]))
+        I0Reshape = np.reshape(self.I0,(self.I0.shape[0],1,self.I0.shape[1],self.I0.shape[2]))
+        GsReshape = np.reshape(Gs,(1,1,Gs.shape[0],Gs.shape[1]))
+
+        predictions = (np.matmul(scipy.linalg.expm(xsReshape*GsReshape),I0Reshape))
+        Errors = np.sum(np.abs(IxReshape - predictions),axis=(0,2,3))
+
+        self.xhat = xs[:,np.argmin(Errors)]
+        self.Ixhat = predictions[:,np.argmin(Errors),:,:]
+
+        print(self.xhat[0])
+        print(self.Ixhat[0])
+
+        return
     
     def exp(self,i,x):
         if i ==0:
             return np.identity(self.G.shape[0])
         return ((x*self.G)**i)/np.math.factorial(i)+self.exp(i-1,x)
 
-    def OptimizeG(self):
-        print("hi")
-        deltG = np.zeros(self.G.shape)
-        for i in range(len(self.x)):
-            print("fs")
-            for j in range(len(self.x[i])):
-                print("\n\n")
-                print(self.x[i][j])
-                # print((self.deltaI[i] -self.x[i][j] * np.matmul(self.G,self.I0)))
-                # print((self.x[i][j]*self.I0))
-                # print(j)
-                deltG[j] += self.alpha * np.matmul(
-                    (self.deltaI[i] -self.x[i][j] * np.matmul(self.G[j],self.I0)) , np.transpose(self.x[i][j]*self.I0)
-                    ) - self.alpha * (self.CInv) * self.G[j]
-            deltG[i] /= (len(self.x)*len(self.x[0]))
-        self.G += deltG
-        # print("\n\n\n\n\n\n\n\n")
-        print(deltG)
+    def OptimizeG(self,xs,Gs):
+        xsReshape = np.reshape(xs,(xs.shape[0],xs.shape[1],1,1))
+        deltaIReshape = np.reshape(self.deltaI,(self.deltaI.shape[0],1,self.deltaI.shape[1],self.deltaI.shape[2]))
+        I0Reshape = np.reshape(self.I0,(self.I0.shape[0],1,self.I0.shape[1],self.I0.shape[2]))
+        GsReshape = np.reshape(Gs,(1,Gs.shape[0],Gs.shape[1],Gs.shape[2]))
 
-        return
-    def Optimizex(self):
+        I0Transpose =  (np.transpose(self.I0,axes=(0,2,1)))
+        I0Transpose = np.reshape(I0Transpose,(I0Transpose.shape[0],1,I0Transpose.shape[1],I0Transpose.shape[2]))
+        xI0Transpose = (np.multiply(xsReshape,I0Transpose))
+        deltaIsubxGI0 =  deltaIReshape- (xsReshape*np.matmul(GsReshape,I0Reshape))
+        deltaGs =  self.alpha * np.matmul(deltaIsubxGI0,xI0Transpose) - self.alpha * self.CInv * GsReshape
 
-        for i in range(len(self.x)):
-            for j in range(len(self.x[i])):
-                print(self.x[i][j])
-                self.x[i][j] += (self.gamma * np.matmul( np.transpose(np.matmul(self.G[j],self.I0)), (self.deltaI[i] - np.matmul(self.x[i][j] * self.G[j],self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
-                # self.x[i][j] += (self.gamma * np.matmul(
-                # np.transpose(
-                #     np.matmul(
-                #         np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.G[j])
-                #         ,self.I0)
-                #         )
-                #         , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
-        # filler = [0,0,0,0,0,,0,0]
-        # for i in range(len(self.x)):
-        #     for j in range(len(self.x[i])):
-        #         self.x[i][j] += (self.gamma * np.matmul(
-        #         np.transpose(
-        #             np.matmul(
-        #                 np.matmul(self.exp(10,self.x[i][j]),self.G)
-        #                 ,self.I0)
-        #                 )
-        #                 , (self.Ix[i] - np.matmul(self.exp(10,self.x[i][j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
-        #         print((self.gamma * np.matmul(
-        #         np.transpose(
-        #             np.matmul(
-        #                 np.matmul(self.exp(10,self.x[i][j]),self.G)
-        #                 ,self.I0)
-        #                 )
-        #                 , (self.Ix[i] - np.matmul(self.exp(10,self.x[i][j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0])
-        
-        # for i in range(len(self.x)):
-        #     for j in range(len(self.x[i])):
-        #         self.x[i][j] += (self.gamma)*( ((1/self.sigma**2)*np.matmul( np.transpose((self.deltaI[i] - np.matmul(self.x[i][j]*self.G, self.I0))),
-        #         np.matmul(self.G , self.I0))) -(self.x[i][j]/self.sigmaX**2))[0][0]
+        return (Gs + np.mean(deltaGs,axis= 0))
 
+    
+    def OptimizexSmall(self,xs,Gs):
+        xsReshape = np.reshape(xs,(xs.shape[0],xs.shape[1],1,1))
+        deltaIReshape = np.reshape(self.deltaI,(self.deltaI.shape[0],1,self.deltaI.shape[1],self.deltaI.shape[2]))
+        I0Reshape = np.reshape(self.I0,(self.I0.shape[0],1,self.I0.shape[1],self.I0.shape[2]))
+        GsReshape = np.reshape(Gs,(1,Gs.shape[0],Gs.shape[1],Gs.shape[2]))
 
-        # for i in range(len(self.x)):
-        #     for j in range(len(self.x[i])):
-        #         self.x[i][j] += (self.gamma * np.matmul(
-        #         np.transpose(
-        #             np.matmul(
-        #                 np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.G[j])
-        #                 ,self.I0)
-        #                 )
-        #                 , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
-                # print((self.gamma * np.matmul(
-                # np.transpose(
-                #     np.matmul(
-                #         np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.G)
-                #         ,self.I0)
-                #         )
-                #         , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0])
-        return    
+        GI0Transpose = np.transpose(np.matmul(GsReshape,I0Reshape),axes = (0,1,3,2))
 
-    def OptimizexLarge(self):
-        for i in range(len(self.x)):
-            for j in range(len(self.x[i])):
-                self.x[i][j] += (self.gamma * np.matmul(
-                np.transpose(
-                    np.matmul(
-                        np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.G[j])
-                        ,self.I0)
-                        )
-                        , (self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G[j]),self.I0)))-((self.gamma)/(self.sigmaX**2) * self.x[i][j]))[0][0]
+        deltaIsubxGI0 = deltaIReshape - xsReshape * np.matmul(GsReshape,I0Reshape)
+        deltaXs = self.gamma * np.matmul(GI0Transpose,deltaIsubxGI0) - self.gamma/(self.sigmaX**2) * xsReshape
+        return xs + np.reshape(deltaXs,(deltaXs.shape[0],deltaXs.shape[1]))
 
-    def ConstructImage(self):
+    def OptimizexLarge(self,xs,G):
+        xsReshape = np.reshape(xs,(xs.shape[0],xs.shape[1],1,1))
+        IxReshape = np.reshape(self.Ix,(self.Ix.shape[0],1,self.Ix.shape[1],self.Ix.shape[2]))
+        I0Reshape = np.reshape(self.I0,(self.I0.shape[0],1,self.I0.shape[1],self.I0.shape[2]))
+        GsReshape = np.reshape(G,(1,1,G.shape[0],G.shape[1]))
 
-        OriginalImage = np.reshape(self.I0,(1,20))
-        cv2.imwrite('outputs/Original.jpg',OriginalImage)
+        expxGGI0Transpose = np.transpose(np.matmul(np.matmul(scipy.linalg.expm(xsReshape*GsReshape),GsReshape),I0Reshape),axes = (0,1,3,2))
+        IxsubexpxGI0 = IxReshape - np.matmul(scipy.linalg.expm(xsReshape*GsReshape),I0Reshape)
 
-        errors = np.zeros((len(self.x),len(self.x[0])))
-        OptXs = np.zeros(len(self.x))
-
-        for i in range(len(self.x)):
-            for j in range(len(self.x[i])):
-                # errors[i][j] = np.sum(np.abs(self.deltaI[i] - np.matmul(self.x[i][j]*self.G,self.I0)))
-                # print(scipy.linalg.expm(x[i][j] * self.G))
-                errors[i][j] = np.sum(np.abs(self.Ix[i] - np.matmul(scipy.linalg.expm(self.x[i][j] * self.G),self.I0)))
-                # print(errors[i][j])
-
-        print(errors)
-
-        for i in range(len(self.x)):
-            # print(self.T[i])
-            # df = pd.DataFrame(self.T[i])
-            # df.to_csv("path/to/file.csv")
-            # print(self.x[i][np.argmin(errors[i])])
-            # print(np.argmin(errors[i]))
-            OptXs[i] = self.x[i][np.argmin(errors[i])]
-            GroundTruthImage = np.reshape(self.Ix[i],(1,20))
-            cv2.imwrite('outputs/GroundTruth'+str(self.T[i])+'.jpg',GroundTruthImage)
-            xGI0 = np.reshape(np.matmul(OptXs[i]*self.G,self.I0),(1,20))
-            cv2.imwrite('outputs/xGI0'+str(self.T[i])+'.jpg',xGI0)
-
-            expxGI0 = np.reshape(np.matmul(scipy.linalg.expm(OptXs[i] * self.G),self.I0),(1,20))
-            cv2.imwrite('outputs/expxGI0'+str(self.T[i])+'.jpg',expxGI0)
-
-
-        print(self.x[0].shape)
-        print(self.T)
-        X_Y_Spline = make_interp_spline(self.T, errors[0])
-        
-        # Returns evenly spaced numbers
-        # over a specified interval.
-        X_ = np.linspace(np.array(self.T).min(), np.array(self.T).max(), 500)
-        Y_ = X_Y_Spline(X_)
-        
-        # Plotting the Graph
-        plt.plot(X_, Y_)
-        plt.title("Plot Smooth Curve Using the scipy.interpolate.make_interp_spline() Class")
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.savefig("x.png")
-        return
+        deltaXs = self.gamma * np.matmul(expxGGI0Transpose,IxsubexpxGI0) - self.gamma/(self.sigmaX**2) * xsReshape
+        return xs + np.reshape(deltaXs,(deltaXs.shape[0],deltaXs.shape[1]))
 
 
 if __name__ == "__main__":
-    # x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.000000001,gamma=0.02,C=0.001)
-    # x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.000000001,gamma=0.000001,C=0.001)
-    # x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00000001,gamma=0.00001,CInv=0.0001)
-    x = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.00001,CInv=1/0.0001)
+    Small = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.000001,CInv=0.0001)
+    Small.DataExtraction(DataSize=25000)
+    Small.Optimize(epoch=1000,numberOfInitialX=2)
 
-    x.DataExtraction()
-    # print(x.x)
-    x.Optimize()
+    a,b= (np.linalg.eig(Small.Ghat))
+
+    plt.plot(a.real)
+    plt.savefig('real.png')
+    plt.close()
+    plt.plot(a.imag)
+    plt.savefig('imag.png')
+    plt.close()
+    plt.plot(Small.Ghat[10])
+    plt.savefig('G10thRow.png')
+    plt.close()
+
+    Large = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.00001,CInv=0.0001)
+    Large.DataExtraction(DataSize=250,T = 1.0,mode = 'Small')
+    Large.Optimize(G= Small.Ghat,epoch=100,numberOfInitialX=1,mode = 'Large')
     # x.ConstructImage()

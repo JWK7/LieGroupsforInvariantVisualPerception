@@ -23,20 +23,20 @@ def ImageToDataFrame() -> np.ndarray:
     return DataFrame
 
 #1D Translation from I0
-def Translation1D(I0: np.ndarray,T) -> np.ndarray:
-    Ts = np.array(T)
-    Ts -= (Ts>0)*((I0.shape)[1])
+# def Translation1D(I0: np.ndarray,T) -> np.ndarray:
+#     Ts = np.array(T)
+#     Ts -= (Ts>0)*((I0.shape)[1])
 
-    Ix = np.empty(I0.shape)
-    # THistory = np.empty(I0.shape[0])
-    for i in range(I0.shape[0]):
-        # T = np.random.randint(1,50)
-        # THistory[i] = Ts
+#     Ix = np.empty(I0.shape)
+#     # THistory = np.empty(I0.shape[0])
+#     for i in range(I0.shape[0]):
+#         # T = np.random.randint(1,50)
+#         # THistory[i] = Ts
 
-        for j in range(I0.shape[1]):
-            Ix[i][j] = I0[i][j+Ts]
+#         for j in range(I0.shape[1]):
+#             Ix[i][j] = I0[i][j+Ts]
 
-    return T,Ix
+#     return T,Ix
 
 def Range(start,end,interval):
     i = start
@@ -46,15 +46,27 @@ def Range(start,end,interval):
         i+=interval
     return output
 
-def Image1D():
-    Img = np.ones((1,20))
-    Img[0][10] = 255.0
-    Img[0][9] = 100.0
-    Img[0][11] = 100.0
-    return Img
+def Image1D(DataSize=100,length: int = 20):
+    return np.random.randint(0,255,(DataSize,length,1))
 
-def Translation1DSubPixel(I0: np.ndarray,T) -> np.ndarray:
-    return T,scipy.ndimage.shift(I0, (0, T),mode ='wrap')
+def Translation1DImage(I0: np.ndarray,x,G) -> np.ndarray:
+    xs = np.random.randint(0,2,(I0.shape[0],1,1))
+    xs[xs==0] = -1
+    xs = xs*x
+    Ix = np.matmul(scipy.linalg.expm(xs*G),I0)
+    return xs,Ix
+
+
+def Translation1DImageLarge(I0: np.ndarray,x) -> np.ndarray:
+    xs = np.random.randint(0,2,(I0.shape[0]))
+    xs[xs==0] = -1
+    xs = xs*x
+    Ix = np.zeros(I0.shape)
+    for i in range(I0.shape[0]):
+        Ix[i] = scipy.ndimage.shift(I0[i],xs[i],mode='wrap')
+    print(I0[0])
+    print(Ix[0])
+    return xs,Ix
     
 
 # def Rotation2D(I0: np.ndarray) -> np.ndarray:
@@ -69,10 +81,11 @@ def Translation1DSubPixel(I0: np.ndarray,T) -> np.ndarray:
 if __name__ == "__main__":
     # ProcessImage((20,20))
     # Translation1D(Data)
-    Data = Image1D()
-    cv2.imwrite('original.jpg',Data)
-    i = -1.5
-    Hist , Img = Translation1D(Data,i)
-    cv2.imwrite('groundtruth'+str(i)+'.jpg',Img)
+    Data = Image1D(10)
+    print(Data)
+    # cv2.imwrite('original.jpg',Data)
+    # i = -1.5
+    # Hist , Img = Translation1D(Data,i)
+    # cv2.imwrite('groundtruth'+str(i)+'.jpg',Img)
     # ProcessImage()
     # ImageToDataFrame()

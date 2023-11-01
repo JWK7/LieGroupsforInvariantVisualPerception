@@ -36,28 +36,17 @@ class InvariantVisualPercentron:
         # print(self.sigma**2)
         return deltaI
 
-    def Optimize(self):
+    def Optimize(self,mode: str,epoch: int = 100, timeEpoch: int = 1):
         errComp = float('inf')
-        for i in range(100):
-            err = 0
-            # print(np.sum(np.abs(self.deltaI -self.x[ * np.matmul(self.G,self.I0))))
-            # print(np.matmul(self.G,self.I0))
-        
-            err = np.sum(np.abs(self.deltaI -self.x * np.matmul(self.G,self.I0)))
+        for i in range(epoch):
 
-            print(err)
-            # err = np.sum(np.abs(self.Ix - np.matmul(scipy.linalg.expm(self.savex * self.saveG),self.I0)))
-            # print(i)
-            # print(err)
+            err = np.sum(np.abs(self.deltaI -self.x * np.matmul(self.G,self.I0)))
             if err < errComp:
                 self.saveG = self.G
                 self.savex = self.x
-            #     errComp = err
 
-            # # print(self.G)
             self.OptimizeG()
-            # self.x = 500
-            for i in range(200):
+            for _ in range(timeEpoch):
             #     # print(scipy.linalg.expm(self.x * self.G)[0])
             #     # print(self.exp(11)[0])
                 self.Optimizex()
