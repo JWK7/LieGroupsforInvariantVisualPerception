@@ -64,8 +64,6 @@ def Translation1DImageLarge(I0: np.ndarray,x) -> np.ndarray:
     Ix = np.zeros(I0.shape)
     for i in range(I0.shape[0]):
         Ix[i] = scipy.ndimage.shift(I0[i],xs[i],mode='wrap')
-    print(I0[0])
-    print(Ix[0])
     return xs,Ix
     
 

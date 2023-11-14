@@ -62,11 +62,12 @@ class InvariantVisualPercentron:
     
     def LargeOptimization(self, G,epoch: int = 100,numberOfInitialX: int = 10):
         # G = self.trueG
-        xs = (np.random.uniform(-self.TParam,self.TParam,(self.I0.shape[0],numberOfInitialX)))
+        # xs = (np.random.uniform(-self.TParam,self.TParam,(self.I0.shape[0],numberOfInitialX)))
+        xs = np.ones((self.I0.shape[0],1))*np.reshape(np.array([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2,1)]),(1,np.array([*range(-self.I0.shape[1]//2,self.I0.shape[1]//2,1)]).shape[0]))
         # xs = np.asarray([*range(-int(self.TParam), int(self.TParam+1))])
         # xs = np.reshape(xs,(xs.shape,1))
-        for _ in range(10):
-            self.gamma *= 0.9
+        for _ in range(epoch):
+            # self.gamma /= 1.0001
             xs = self.OptimizexLarge(xs,G)
             print(xs[0])
         self.SaveOptimalLarge(xs,G)
@@ -103,8 +104,9 @@ class InvariantVisualPercentron:
         self.xhat = xs[:,np.argmin(Errors)]
         self.Ghat = Gs[np.argmin(Errors),:,:]
         self.Ixhat = predictions[:,np.argmin(Errors),:,:]
-        print(self.xhat[0])
-        print(self.Ixhat[0])
+
+        self.xhat *= np.max(self.Ghat)/1
+        self.Ghat *= 1/np.max(self.Ghat)
 
         return
     
@@ -170,24 +172,40 @@ class InvariantVisualPercentron:
         return xs + np.reshape(deltaXs,(deltaXs.shape[0],deltaXs.shape[1]))
 
 
+def getRange(maximum: int, numberOfInitialX: int):
+    scale = (maximum)/(numberOfInitialX+1)
+    # output = scale/2*np.ones(numberOfInitialX)
+    # output = np.array(dataFunctions.Range(minimum,maximum,scale/2))
+    # output += scale/2
+    # output = []
+    # for i in range(1,numberOfInitialX+1):
+    #     output.append(i*scale+minimum)
+    return scale
+
 if __name__ == "__main__":
     Small = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.000001,CInv=0.0001)
     Small.DataExtraction(DataSize=25000)
-    Small.Optimize(epoch=1000,numberOfInitialX=2)
+    Small.Optimize(epoch=1000,numberOfInitialX=1)
 
-    a,b= (np.linalg.eig(Small.Ghat))
+    print(Small.xhat)
+    # a,b= (np.linalg.eig(Small.Ghat))
 
-    plt.plot(a.real)
-    plt.savefig('real.png')
-    plt.close()
-    plt.plot(a.imag)
-    plt.savefig('imag.png')
-    plt.close()
-    plt.plot(Small.Ghat[10])
-    plt.savefig('G10thRow.png')
-    plt.close()
+    # plt.plot(a.real)
+    # plt.savefig('real.png')
+    # plt.close()
+    # plt.plot(a.imag)
+    # plt.savefig('imag.png')
+    # plt.close()
+    # plt.plot(Small.Ghat[10])
+    # plt.savefig('G10thRow.png')
+    # plt.close()
 
-    Large = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.00001,CInv=0.0001)
-    Large.DataExtraction(DataSize=250,T = 1.0,mode = 'Small')
-    Large.Optimize(G= Small.Ghat,epoch=100,numberOfInitialX=1,mode = 'Large')
-    # x.ConstructImage()
+    # trueG = pd.read_csv("LieOpOpt_20.csv",header=None).to_numpy()
+    # trueG /= 0.5
+    # plt.plot(trueG[10])
+    # plt.savefig('G10thRow.png')
+    # plt.close()
+
+    # Large = InvariantVisualPercentron(sigma=1,sigmaX=1,alpha=0.00001,gamma=0.000001,CInv=0.0001)
+    # Large.DataExtraction(DataSize=100,T = 1.0,mode = 'Small')
+    # Large.Optimize(G= Small.Ghat,epoch=20,numberOfInitialX=10,mode = 'Large')
